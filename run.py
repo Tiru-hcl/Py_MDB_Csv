@@ -15,8 +15,12 @@ class Operations:
         '''
         dta op method to record count
         '''
-        record_count = MongoDB.db_config().find().count()
-        return record_count
+        try:
+            record_count = MongoDB.db_config().find().count()
+        except Exception as e:
+            return e
+        else:
+            return record_count
 
     def store_records(self):
         '''
@@ -31,7 +35,8 @@ class Operations:
                     MongoDB.insert_record(each_record)
         except Exception as e:
             return e
-        return 'records inserted successfully'
+        else:
+            return 'records inserted successfully'
 
     def record_deletion(self):
         '''
@@ -41,23 +46,32 @@ class Operations:
             deleted_records= MongoDB.delete_rec(self.db_config)
         except Exception as e:
             return e
-        return deleted_records
+        else:
+            return deleted_records
 
     def updating_records(self):
         '''
         data operation method to update records
         '''
         json_data = File_Handle.read_json()
-        update_result = MongoDB.update_records(self.db_config,json_data['query'],json_data['value'])
-        return update_result
+        try:
+            update_result = MongoDB.update_records(self.db_config,json_data['query'],json_data['value'])
+        except Exception as e:
+            return e
+        else:
+            return update_result
 
     def sorting_records(self):
         '''
         method to sort record
         '''
         json_data = File_Handle.read_json()
-        sorting_ascending_order = MongoDB.sort(self.db_config,json_data['field'])
-        return sorting_ascending_order
+        try:
+            sorting_ascending_order = MongoDB.sort(self.db_config,json_data['field'])
+        except Exception as e:
+            return e
+        else:
+            return sorting_ascending_order
 
 
 
