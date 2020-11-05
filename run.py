@@ -25,16 +25,22 @@ class Operations:
         '''
         json_data = File_Handle.read_json()
         csv_rec = File_Handle.Csv_read(json_data['path'])
-        for each_record in csv_rec:
-            if each_record not in self.db_config.find(json_data['order_ID']):
-                MongoDB.insert_record( each_record)
+        try:
+            for each_record in csv_rec:
+                if each_record not in self.db_config.find(json_data['order_ID']):
+                    MongoDB.insert_record(each_record)
+        except Exception as e:
+            return e
         return 'records inserted successfully'
 
     def record_deletion(self):
         '''
         data op method to delete records
         '''
-        deleted_records= MongoDB.delete_rec(self.db_config)
+        try:
+            deleted_records= MongoDB.delete_rec(self.db_config)
+        except Exception as e:
+            return e
         return deleted_records
 
     def updating_records(self):
