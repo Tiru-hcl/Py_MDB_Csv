@@ -1,60 +1,58 @@
+'''
+module to do all data operations
+'''
 import util
-import json
-from util import File_Handler,MongoDb
-
-
-class Data_operations:
+from util import MongoDB,File_Handle
+class Operations:
     '''
-    class contains all data operations
+    class contains all data operation methods
     '''
 
-    def __init__(self,host,port,db_name,collection_name,path,field,query,value):
-        self.path = path
-        self.host = host
-        self.port = port
-        self.db_name = db_name
-        self.collection_name = db_name
-        self.field = field
-        self.query = query
-        self.value = value
+    def __init__(self):
+        self.db_config = MongoDB.db_config()
 
-    def sort_records(self):
+    def get_records(self):
         '''
-        method call to sort records
-        :return: sorted records obj
+        dta op method to record count
         '''
-        sorted_records = MongoDb.sort_records_ascending(self.host,self.port,self.db_name,self.collection_name,self.field)
-        return sorted_records
+        record_count = MongoDB.db_config().find().count()
+        return record_count
 
-    def insert_records(self):
+    def store_records(self):
         '''
-        method call to insert records
+        method to store each record into mongodb
+        :return:
         '''
-        records_inserted= MongoDb.insert_each_record(self.host,self.port, self.db_name, self.collection_name, self.path)
-        return records_inserted
+        json_data = File_Handle.read_json()
+        csv_rec = File_Handle.Csv_read(json_data['path'])
+        for each_record in csv_rec:
+            if each_record not in self.db_config.find(json_data['order_ID']):
+                MongoDB.insert_record( each_record)
+        return 'records inserted successfully'
 
-    def delete_records(self):
+    def record_deletion(self):
         '''
-        method call to delete records
+        data op method to delete records
         '''
-        records_delete = MongoDb.delete_records(self.host,self.port, self.db_name, self.collection_name)
-        return records_delete
+        deleted_records= MongoDB.delete_rec(self.db_config)
+        return deleted_records
 
-    def update_records(self):
-        records_update=util.MongoDb.update_records(self.host,self.port, self.db_name, self.collection_name,self.query,self.value)
-        return records_update
-
-    def csv_reader(self):
-        gen_csv_obj = util.File_Handler.read_csv(self.path)
-        return gen_csv_obj
-
-    def json_read(self):
+    def updating_records(self):
         '''
-        call json read method
-        :return: return
+        data operation method to update records
         '''
-        json_obj = util.File_Handler.json_file_read(self.path)
-        return json_obj
+        json_data = File_Handle.read_json()
+        update_result = MongoDB.update_records(self.db_config,json_data['query'],json_data['value'])
+        return update_result
+
+    def sorting_records(self):
+        '''
+        method to sort record
+        '''
+        json_data = File_Handle.read_json()
+        sorting_ascending_order = MongoDB.sort(self.db_config,json_data['field'])
+        return sorting_ascending_order
+
 
 
 

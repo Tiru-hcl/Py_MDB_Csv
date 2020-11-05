@@ -1,3 +1,4 @@
+
 {
   "path"          : "E:/db/100000_Sales_Records.csv",
   "db_name"       : "Sales_DB",
@@ -5,6 +6,7 @@
   "host"          : "localhost",
   "port_number"   : 27017,
   "field"         : "Total Sales",
+  "order_ID"      : "Order ID",
   "query"         : {"Region" : "Europe" },
   "value"         :  { "$set": { "Region": "Europe_Union" } }
 

@@ -1,93 +1,111 @@
+'''
+This module contains file handling methods and all db configuration, CRUD operation
+'''
+import json
 import csv
 import pymongo
-import json
 
-class File_Handler:
+
+class File_Handle:
     '''
-    This class conatins methods for file handling
+     class have methods to handle csv files and json file
     '''
+    @staticmethod
+    def read_json():
+        '''
+        method to read json file to read json file
+        :return: dict object
+        '''
+        with open('config.json') as config_file:
+            data = json.load(config_file)
+        return data
 
     @staticmethod
-    def read_csv(file_path):
+    def Csv_read(file_path):
         '''
-        To read csv file
-        :param file_path: file location path
-        :return: generator object
+        method to read csv file
+        :param file_path:file location
+        :return: list contains all dictionary data
         '''
         with open(file_path, 'r') as a:
+            data_list = []
             cs_r = csv.DictReader(a)
-            yield cs_r
+            for each in cs_r:
+                list.append(each)
+        return data_list
 
-    @staticmethod
-    def json_file_read(file_location):
-        '''
-         Opening JSON file
-        :param file_location:
-        :return: json
-        '''
-        with open(file_location, 'r') as openfile:
-            # Reading from json file
-            json_object = json.load(openfile)
-        return json_object
-
-class MongoDb:
+class MongoDB:
     '''
-    This class havs methods from DB CRUD operations
+    class have methods fo db_configuration and CRUD operations
     '''
 
     @staticmethod
-    def db_details(host,port_number,db_name,collection_name):
+    def db_config():
         '''
-        method to connect datbase
-        :param host:db host
-        :param port_number:db port_number
-        :param db_name:database name
-        :param collection_name:collection name
-        :return:db driver
+        method to configure db
+        :return: db connection details
         '''
-        mongo_client = pymongo.MongoClient(host, port_number)
-        mongo_db = mongo_client[db_name]
-        collection_name = collection_name
+        json_data = File_Handle.read_json()
+        mongo_client = pymongo.MongoClient(json_data['host'], json_data['port_number'])
+        mongo_db = mongo_client[json_data['db_name']]
+        collection_name = json_data['coll_name']
         db_connect = mongo_db[collection_name]
         return db_connect
 
     @staticmethod
-    def insert_each_record(host, port_number, db_name, collection_name, path):
+    def count_records(db_details):
         '''
-        Method to insert each record from generator object to mongodb
+        method to count records in collection
+        :param db_details: db connection details
+        :return: record count
         '''
-        for records in File_Handler.read_csv(path):
-            for each_record in records:
-                MongoDb.db_details(host, port_number, db_name, collection_name).insert(each_record)
-            return True
+        record_count = db_details.find().count()
+        return record_count
 
     @staticmethod
-    def sort_records_ascending(host,port_number,db_name,collection_name,field):
+    def sort_records(db_details,field):
         '''
-        To sort records
-        :param field: sort based on which field
-        :return:  return sorted records
+        method to sort records
+        :param db_details: db_connection details
+        :param field: field to sort
+        :return:
         '''
-        sorted_records = MongoDb.db_details(host,port_number,db_name,collection_name).find().sort('field',1)
-        return sorted_records
+        sorted_record = db_details.find().sort(field,1)
+        return sorted_record
 
     @staticmethod
-    def delete_records(host,port_number,db_name,collection_name):
+    def insert_record(record):
         '''
-        To delete all records in collection
+        method to insert record
+        :param rec: which record to insert
+        :return: return id obj
         '''
-        MongoDb.db_details(host, port_number, db_name, collection_name).remove({})
-        return 'all records removed from collection'
+        record_insert = MongoDB.db_config().insert_one(record)
+        return record_insert
 
     @staticmethod
-    def update_records(host,port_number,db_name,collection_name,query,value):
+    def delete_rec(db_details):
         '''
-        to update records in db
-        query : previous one   query = { "key": "Value" }
-        value :updated one    value = { "$set": { "key": "updated value" } }
+        method to delete all records
+        :param db_details: db connection details
+        :return: delete record obj
         '''
-        MongoDb.db_details(host, port_number, db_name, collection_name).update(query,value)
-        return 'records updated'
+        delete_record = db_details.remove({})
+        return delete_record
+
+    @staticmethod
+    def update_records(db_details,query,value):
+        '''
+        method to update record
+        :param db_details: db connection
+        :param query: previous value
+        :param value: upadate value
+
+        '''
+        record_update = db_details.update_many(query, value)
+        return record_update
+
+
 
 
 
