@@ -45,12 +45,16 @@ class MongoDB:
         method to configure db
         :return: db connection details
         '''
-        json_data = File_Handle.read_json()
-        mongo_client = pymongo.MongoClient(json_data['host'], json_data['port_number'])
-        mongo_db = mongo_client[json_data['db_name']]
-        collection_name = json_data['coll_name']
-        db_connect = mongo_db[collection_name]
-        return db_connect
+        try:
+            json_data = File_Handle.read_json()
+            mongo_client = pymongo.MongoClient(json_data['host'], json_data['port_number'])
+            mongo_db = mongo_client[json_data['db_name']]
+            collection_name = json_data['coll_name']
+            db_connect = mongo_db[collection_name]
+        except Exception as e:
+            return e
+        else:
+            return db_connect
 
     @staticmethod
     def count_records(db_details):
