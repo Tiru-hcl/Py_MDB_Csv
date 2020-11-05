@@ -1,0 +1,17 @@
+{
+  "path"          : "E:/db/100000_Sales_Records.csv",
+  "db_name"       : "Sales_DB",
+  "coll_name"     : "Sales_Records",
+  "host"          : "localhost",
+  "port_number"   : 27017,
+  "field"         : "Total Sales",
+  "query"         : {"Region" : "Europe" },
+  "value"         :  { "$set": { "Region": "Europe_Union" } }
+
+
+
+}
+
+
+
+
